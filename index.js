@@ -23,8 +23,7 @@ app.set('view engine', 'ejs');
 
 
 app.get('/',function(req,res){
-
-res.render('nickname');
+	res.render('nickname');
 });
 
 app.post('/chatapp',function(req,res,next){
@@ -35,7 +34,8 @@ app.post('/chatapp',function(req,res,next){
 	for(var i=0;i<users.length;i++){
 		if(users[i]==req.body.nickname){
 			flag=0;	
-		res.render('nickname');
+			res.render('nickname'); //redirect to nickname page on refresh
+
 		}
 
 	}
@@ -64,8 +64,10 @@ app.get('/chatapp',function(req,res){
 // });
 io.sockets.on('connection', function(socket){
 		socket.on('init', function(nicknames){
+			console.log('connection established');
 			users[nicknames]=socket.id;
-			sockets[socket.id]={username: nicknames, socket: socket};
+			console.log(users);
+			//sockets[socket.id]={username: nicknames, socket: socket};
 		});
 		socket.on('private message', function(to, message){
 			sockets[users[to]].emit(
@@ -83,20 +85,47 @@ io.on('connection',function(socket){
 	console.log('a user connected');
 	socket.on('chat message', function(msg){
     io.emit('chat message', msg);
-  });
-	 socket.on('user connected', function(nickname){
-    io.emit('user connected', nickname);
-});
-	socket.on('disconnect', function() {
+  	});
+
+	socket.on('user connected', function(nickname){
+    socket.broadcast.emit('user connected', nickname);
+    console.log('user list');
+	});
+
+	socket.on('disconnect', function(nickname) {
+		console.log(nickname);
 		console.log("Disconnected");
+		//Array.prototype.remove = function(v) { this.splice(this.indexOf(v) == -1 ? this.length : this.indexOf(v), 1); }
+		//users.remove(nickname);
+
+		//console.log(users);
 		/* Act on the event */
 	});
+
 	socket.on('connect',function(){
-console.log('List of Users');
+		console.log('List of Users');
 	});
-	// socket.on('chat message', function(msg){
-	//     console.log('message: ' + msg);
-	//   });
+
+
+
+	socket.on('wchat message', function(msg,to,from){
+		
+
+		io.to(users[to]).emit('wchat message',msg,to,from);
+		
+	    console.log('message: ' + msg+'to' +to);
+	  });
+
+	socket.on('logout', function(nickname) {
+		console.log( users[nickname]);
+		delete users[nickname];
+		var index=users.indexOf(nickname);
+		users.splice(index,1);
+		console.log("Delete success.");
+
+		console.log(users);
+		/* Act on the event */
+	});
 
 });
 

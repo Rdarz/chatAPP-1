@@ -1,121 +1,213 @@
 <!doctype html>
 <html>
-
   <head>
     <title>Socket.IO chat</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="../public/style.css">
   </head>
   
-
   <body>
- 
-    <div class="left_sidebar"> 
-      <div class="left_sidebar_head"><h1>Welcome</h1></div>  
-      <ul id="messages" style="margin-top:5%;">  </ul>
-      <form action="">
-        <input id="m" autocomplete="off" /><button>Send</button>
-      </form>  
-      <div class="chatbox">
-        
-         
-      </div>  
-    </div>
-
-
-    <div class="right_sidebar">  
-       <ul id="userlist">
-            <h3 class="glyphicon glyphicon-user online_users"> OnlineUsers </h3>
-            <% for(var i=0; i<user.length; i++) {%>
-              <li class="open_chat_window">
-                <p><%= user[i]%></p>
-              </li> <% }  %>
-      </ul>
-    </div> 
-
     
+    <div class="left_sidebar">
+      <div class="left_sidebar_head"><h1>Group Chat</h1></div>
+    <ul id="messages" style="margin-top:5%;">  </ul>
+    <form action="">
+      <i class="emo_button">☺</i><input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <div class="chatbox"></div>
+    <div class="emo_box" >
+      <span class="smiley">&#128512;</span> <span class="smiley">&#128513;</span> <span class="smiley">&#128514;</span> <span class="smiley">&#128515;</span> <span class="smiley">&#128516;</span> <span class="smiley">&#128517;</span> <span class="smiley">&#128518;</span> <span class="smiley">&#128519;</span> <span class="smiley">&#128520;</span> <span class="smiley">&#128521;</span> <span class="smiley">&#128522;</span> <span class="smiley">&#128523;</span> <span class="smiley">&#128524;</span> <span class="smiley">&#128525;</span> <span class="smiley">&#128526;</span> <span class="smiley">&#128527;</span> <span class="smiley">&#128528;</span> <span class="smiley">&#128529;</span> <span class="smiley">&#128530;</span> <span class="smiley">&#128531;</span> <span class="smiley">&#128532;</span> <span class="smiley">&#128533;</span> <span class="smiley">&#128534;</span> <span class="smiley">&#128535;</span> <span class="smiley">&#128536;</span> <span class="smiley">&#128537;</span> <span class="smiley">&#128538;</span> <span class="smiley">&#128539;</span> <span class="smiley">&#128540;</span> <span class="smiley">&#128541;</span> <span class="smiley">&#128542;</span> <span class="smiley">&#128543;</span> <span class="smiley">&#128544;</span> <span class="smiley">&#128549;</span> <span class="smiley">&#128550;</span> <span class="smiley">&#128551;</span> <span class="smiley">&#128552;</span> <span class="smiley">&#128553;</span> <span class="smiley">&#128554;</span> <span class="smiley">&#128555;</span> <span class="smiley">&#128556;</span> <span class="smiley">&#128557;</span> <span class="smiley">&#128558;</span> <span class="smiley">&#128559;</span> <span class="smiley">&#128560;</span> <span class="smiley">&#128561;</span> <span class="smiley">&#128562;</span> <span class="smiley">&#128563;</span> <span class="smiley">&#128564;</span> <span class="smiley">&#128565;</span> <span class="smiley">&#128566;</span> <span class="smiley">&#128567;</span> <span class="smiley">&#128568;</span> <span class="smiley">&#128569;</span> <span class="smiley">&#128570;</span> <span class="smiley">&#128571;</span> <span class="smiley">&#128572;</span> <span class="smiley">&#128573;</span> <span class="smiley">&#128574;</span> <span class="smiley">&#128575;</span> <span class="smiley">&#128576;</span> <span class="smiley">&#128577;</span> <span class="smiley">&#128578;</span> <span class="smiley">&#128581;</span> <span class="smiley">&#128582;</span> <span class="smiley">&#128583;</span> <span class="smiley">&#128584;</span> <span class="smiley">&#128585;</span> <span class="smiley">&#128586;</span> <span class="smiley">&#128587;</span> <span class="smiley">&#128588;</span> <span class="smiley">&#128589;</span> <span class="smiley">&#128590;</span> <span class="smiley">&#128591;</span>
+    </div>
+  </div>
+  <div class="right_sidebar">
+    <ul id="userlist">
+      <h3 class="glyphicon glyphicon-user online_users">   <%= nickname%> <a href="#" class="logout glyphicon glyphicon-log-out text-right" id="logout"></a></h3>
+      <% for(var i=0; i<user.length; i++) {%>
+      <li class="open_chat_window">
+        <% if( user[i] !=  nickname){  %>
+        <p><%= user[i]%></p>
+      </li> <% }  }%>
+    </ul>
+  </div>
+  
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="/redirect.js"></script>
+  <script>
+  var socket = io();
+  </script>
+  <script>
+
+function disableF5(e) { if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) e.preventDefault(); };
+
+
+     $(document).on("keydown", disableF5);
 
 
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-    <script src="/redirect.js"></script>
-    <script>
-      var socket = io();
-    </script>
-
-    <script>
-       
-
-          $('body').on('click', '#close_chat_window', function(event) {
-                                   $(this).parent().parent().parent().css('display', 'none');
-          });
-
-          $('body').on('click', '.open_chat_window', function(event) {
-               
-                $('.chatbox').append('<div class="chat_window"><div class="chat_window_head"><b>'+$(this).text()+'<a href="#" class="glyphicon glyphicon-remove right" id="close_chat_window"></a></b></div><ul id="chat_window_msg" >  </ul><input id="cm" autocomplete="off" class="input border_black"/></div>');
-                
-                $(this).$('.chat_window').css('display','block');
-
-            /* Act on the event */
-          });
 
 
 
-          $('#messages').load(function(){
-            var user=$.get('http://localhost:3000/chatapp', {}, function(data){
-              console.log(data+":data");
-            });
 
-          });
+  $(function(){
+    socket.emit('init','<%= nickname%>');
+    return false;
+  });
 
-          // var userlist=[];
-          // userlist.push(user);
-          // console.log(userlist);
-          var socket = io();
-          socket.emit('user connected','<%= nickname%>');
-          socket.on('user connected',function(nickname){
-            $('#userlist').append($('<li class="open_chat_window">').text(nickname));
-            console.log('calling');
-          });
 
-          $('form').submit(function(){
-            socket.emit('chat message', '<%= nickname%>  - ' + $('#m').val());
-            $('#m').val('');
-            return false;
-          });
-
-          // $('#cm').keypress(function(event) {
-          //     if(event.which == 13){
-          //       alert("work");
-          //       // socket.emit('wchat message', '<%= nickname%>  - ' + $('#cm').val());
-          //       // $('#cm').val('');
-          //       // return false;
-          //     }
-          // });
-            
-$("body").on('keypress', '#cm', function(event) {
-  if(event.which==13){
-console.log($('#cm').val());
-            socket.emit('wchat message', '<%= nickname%>  - ' + $('#cm').val());
-                $('#cm').val('');
-                return false;
+ 
+  $('body').on('click', '#close_chat_window', function(event) {
+  $(this).parent().parent().parent().css('display','none');
+  });
+  $('body').on('click', '.open_chat_window', function(event) {
+  if($('.chat_window_msg').hasClass($.trim($(this).text()))){
+          console.log("working---->"+$(this).text());
+          $("#"+$.trim($(this).text())).parent().css('display','block');
+  
+      }else{
+  $('.chatbox').append('<div class="chat_window"><div class="chat_window_head"><b>'+$(this).text()+'<a href="#" class="glyphicon glyphicon-remove right" id="close_chat_window"></a></b></div><ul id="'+$.trim($(this).text())+'"class="'+$.trim($(this).text())+' chat_window_msg">  </ul><input id="cm" autocomplete="off" class="wchat_input border_black"/></div>');
   }
+  
   /* Act on the event */
-});
+  });
+ 
+  // var userlist=[];
+  // userlist.push(user);
+  // console.log(userlist);
+  var socket = io();
+  
 
 
 
-          socket.on('chat message', function(msg){
-            $('#messages').append($('<li>').text(msg));
+
+
+
+ $('body').on('click', '.logout', function(event) {
+    socket.emit('logout','<%= nickname%>');
+  });
+
+  socket.emit('user connected','<%= nickname%>');
+  socket.on('user connected',function(nickname){
+   $('#userlist').append($('<li class="open_chat_window">').text(nickname));
+    console.log('calling');
+    });
+
+
+    $('body').on('click', '#logout', function(event) {
+      window.location="/";
+      socket.emit('disconnect','<%= nickname%>');
+
+    });
+    $('form').submit(function(){
+      if($('#m').val()==""){
+                    console.log('fill value');
+                                  }else{         
+                    // $(this).parent().find('ul').append('<li>'+$(this).val());
+                    socket.emit('chat message', '<%= nickname%>  - ' + $('#m').val());
+                    $('#m').val('');
+                         temp="";
+                   
+                  }
+                   return false;
+    });
+
+
+
+
+    var temp="";
+    $('body').on('click','.smiley',function(){
+      temp+=$(this).text();
+      $('#m').val(temp);
+      
+    });
+    
+    
+    $(".chatbox").on('keypress', 'input', function(event) {
+        
+          // scroll to down
+          var height_group_chat = 0;
+          
+          $('.chat_window_msg li').each(function(i, value){
+              height_group_chat += parseInt($('.chat_window_msg').height());
           });
-          socket.on('wchat message', function(msg){
-            console.log(msg);
-            $('#chat_window_msg').append($('<li>').text(msg));
-          });
-         
-    </script>
+          $('.chat_window_msg').animate({scrollTop: height_group_chat});
+          
+          // end scroll to down 
 
-  </body>
-</html>
+
+        if(event.which==13){
+            if($(this).val()==""){
+              console.log('fill value');
+            }else{
+                    console.log($(this).val());
+                    $(this).parent().find('ul').append('<li>'+"Me: "+$(this).val());
+                    socket.emit('wchat message', '<%= nickname%>: ' + $.trim($(this).val()),$.trim($(this).parent().find('b').text()),'<%= nickname%>');
+                    $(this).val('');
+
+                    
+                  }
+                  return false;
+
+        }
+          
+    
+    });
+     $(".left_sidebar").on('keypress', 'input', function(event) {
+        
+          // scroll to down
+        
+          var height_private_chat=0
+          
+          $('.left_sidebar').each(function(i, value){
+              height_private_chat += parseInt($('body').height());
+          });
+          $('.left_sidebar').animate({scrollTop: height_private_chat});
+          // end scroll to down 
+
+
+        if(event.which==13){
+             if($('#m').val()==""){
+                    console.log('fill value');
+                                  }else{         
+                    // $(this).parent().find('ul').append('<li>'+$(this).val());
+                    socket.emit('chat message', '<%= nickname%>  - ' + $('#m').val());
+                    $('#m').val('');
+                         temp="";
+                   
+                  }
+                   return false;
+        }
+    
+    });
+
+
+    $( ".emo_button" ).mouseenter(function() {
+        $(".emo_box").css('display', 'block');
+    });
+
+    $( ".emo_box" ).mouseleave(function() {
+        $(".emo_box").css('display', 'none');
+    });
+
+    socket.on('chat message', function(msg){
+        $('#messages').append($('<li>').html(msg));
+    });
+    
+    socket.on('wchat message', function(msg,to,from){
+      console.log("nickname5----->"+$.trim(to));
+      if($('.chat_window_msg').hasClass(from)){
+          console.log("working---->"+from);
+          $('#'+$.trim(from)+'').append('<li>'+msg);
+      }else{
+        console.log("working-else---->"+from);
+
+       $('.chatbox').append('<div class="chat_window"><div class="chat_window_head"><b>'+from+'<a href="#" class="glyphicon glyphicon-remove right" id="close_chat_window"></a></b></div><ul id="'+from+'"class="'+from+' chat_window_msg">  </ul><input id="cm" autocomplete="off" class="wchat_input border_black"/></div>');
+
+      $('#'+$.trim(from)+'').append('<li>'+msg);
+    }
+    });
+        
+        </script>
+      </body>
+    </html>
